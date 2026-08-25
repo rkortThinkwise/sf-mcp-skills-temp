@@ -1,0 +1,243 @@
+<!--
+Starting-point template for a "big plan" build-plan Artifact.
+This file is a REFERENCE to copy from, not something to publish as-is.
+
+Usage:
+1. Load the artifact-design skill first (required before writing any Artifact
+   HTML) to calibrate design investment for this specific plan.
+2. Copy this file's contents into the scratchpad, replace every {{...}}
+   placeholder, delete any <details> group that has no content for this plan
+   (never ship an empty accordion section), and publish with the Artifact
+   tool. Pick a favicon (suggest one or two emoji, e.g. a clipboard/blueprint
+   emoji) and a stable file path so re-publishing this plan updates the same
+   artifact instead of minting a new URL.
+3. Paste the logo markup from assets/thinkwise_logo_inline.svg in place of
+   the {{LOGO_SVG}} placeholder — do not link to the .svg file, it must be
+   inlined since Artifacts cannot fetch external resources.
+
+Section keys used below (skip/delete any with nothing to report):
+  data-model        Data Model
+  interaction       Screens & Interaction
+  tasks             Tasks
+  process-flows     Process Flows
+  logic             Control Procedures & Logic
+  subroutines       Subroutines
+  messages          Messages
+  menu              Menu & Entry Points
+  cross-cutting     Cross-Cutting Concerns (translations, security, maps)
+  unit-tests        Unit Tests
+  sequencing        Sequencing
+  risks             Open Risks
+
+The Final Verification Gate is NOT an accordion item — it always renders as
+an always-visible callout at the bottom, per the build planner skill's rule
+that it must never be left implicit.
+-->
+<style>
+  :root {
+    --bg: #F7F8FA;
+    --surface: #FFFFFF;
+    --border: #E1E5EA;
+    --text: #1A1D21;
+    --text-muted: #5B6470;
+    --accent: #1D71B8;
+    --accent-2: #38A8E0;
+    --accent-3: #1C52A1;
+    --ink: #0A0907;
+    --tag-bg: #EAF3FB;
+    --tag-text: #1C52A1;
+    --risk-bg: #FFF6E5;
+    --risk-border: #E8C468;
+    --gate-bg: #EAF6EC;
+    --gate-border: #3FA85C;
+
+    --logo-ink: #0A0907;
+    --logo-blue-1: #1D71B8;
+    --logo-blue-2: #38A8E0;
+    --logo-blue-3: #1C52A1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171A;
+      --surface: #1D2125;
+      --border: #2C3136;
+      --text: #EDEFF2;
+      --text-muted: #9AA3AD;
+      --accent: #4A9FD8;
+      --accent-2: #38A8E0;
+      --accent-3: #6FA8E8;
+      --tag-bg: #1E3A54;
+      --tag-text: #9CCBEF;
+      --risk-bg: #3A2E12;
+      --risk-border: #A9822F;
+      --gate-bg: #16321E;
+      --gate-border: #3FA85C;
+
+      --logo-ink: #F5F3F0;
+      --logo-blue-1: #4A9FD8;
+      --logo-blue-3: #2E6BB8;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171A;
+    --surface: #1D2125;
+    --border: #2C3136;
+    --text: #EDEFF2;
+    --text-muted: #9AA3AD;
+    --accent: #4A9FD8;
+    --accent-2: #38A8E0;
+    --accent-3: #6FA8E8;
+    --tag-bg: #1E3A54;
+    --tag-text: #9CCBEF;
+    --risk-bg: #3A2E12;
+    --risk-border: #A9822F;
+    --gate-bg: #16321E;
+    --gate-border: #3FA85C;
+
+    --logo-ink: #F5F3F0;
+    --logo-blue-1: #4A9FD8;
+    --logo-blue-3: #2E6BB8;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+  .plan-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  .plan-header { margin-bottom: 1.75rem; }
+  .plan-header .tw-logo { width: 150px; height: auto; display: block; margin-bottom: 1.25rem; }
+  .plan-header h1 { font-size: 1.5rem; margin: 0 0 0.9rem; color: var(--text); }
+
+  .goal-box {
+    border-left: 4px solid var(--accent);
+    background: var(--surface);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .goal-box .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); font-weight: 600; margin-bottom: 0.3rem; }
+  .goal-box p { margin: 0; color: var(--text); }
+
+  .summary-box p { color: var(--text-muted); line-height: 1.55; margin: 0 0 0.5rem; }
+
+  .accordion { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 0.75rem; background: var(--surface); }
+  .accordion + .accordion { margin-top: 0.75rem; }
+
+  details.group summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 0.85rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    color: var(--text);
+    user-select: none;
+  }
+  details.group summary::-webkit-details-marker { display: none; }
+  details.group summary::before {
+    content: "▸";
+    color: var(--accent);
+    margin-right: 0.6rem;
+    transition: transform 0.15s ease;
+    display: inline-block;
+  }
+  details.group[open] summary::before { transform: rotate(90deg); }
+  details.group summary .count {
+    font-weight: 400;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    background: var(--tag-bg);
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+  }
+  details.group summary .summary-left { display: flex; align-items: center; gap: 0; }
+  details.group .body { padding: 0 1.1rem 1.1rem; border-top: 1px solid var(--border); }
+
+  .item { padding: 0.85rem 0; border-bottom: 1px dashed var(--border); }
+  .item:last-child { border-bottom: none; }
+  .item .decision { font-weight: 600; margin-bottom: 0.25rem; }
+  .item .principle { color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; margin-bottom: 0.35rem; }
+  .item .skill-tag { display: inline-block; font-size: 0.72rem; font-family: ui-monospace, Consolas, monospace; background: var(--tag-bg); color: var(--tag-text); padding: 0.15rem 0.5rem; border-radius: 4px; }
+
+  .risk-item { background: var(--risk-bg); border: 1px solid var(--risk-border); border-radius: 6px; padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; }
+  .risk-item:last-child { margin-bottom: 0; }
+
+  .controls { display: flex; gap: 0.6rem; margin: 1.25rem 0 1rem; }
+  .controls button {
+    font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer;
+  }
+  .controls button:hover { color: var(--text); border-color: var(--accent); }
+
+  .gate {
+    margin-top: 1.5rem;
+    background: var(--gate-bg);
+    border: 1px solid var(--gate-border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+  }
+  .gate .label { font-weight: 700; margin-bottom: 0.3rem; }
+  .gate p { margin: 0; color: var(--text); line-height: 1.5; }
+
+  @media (max-width: 480px) {
+    .plan-header .tw-logo { width: 110px; }
+  }
+</style>
+
+<div class="plan-wrap">
+  <div class="plan-header">
+    {{LOGO_SVG}}
+    <h1>{{PLAN_TITLE}}</h1>
+    <div class="goal-box">
+      <div class="label">Goal</div>
+      <p>{{GOAL_STATEMENT}}</p>
+    </div>
+    <div class="summary-box">
+      <p>{{SUMMARY_PARAGRAPH}}</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button type="button" onclick="document.querySelectorAll('details.group').forEach(d=>d.open=true)">Expand all</button>
+    <button type="button" onclick="document.querySelectorAll('details.group').forEach(d=>d.open=false)">Collapse all</button>
+  </div>
+
+  <!-- Repeat this .accordion block once per non-empty section, in this order:
+       Data Model, Screens & Interaction, Tasks, Process Flows,
+       Control Procedures & Logic, Subroutines, Messages, Menu & Entry Points,
+       Cross-Cutting Concerns, Unit Tests, Sequencing, Open Risks -->
+  <div class="accordion">
+    <details class="group" open>
+      <summary>
+        <span class="summary-left">{{SECTION_NAME}}</span>
+        <span class="count">{{N}} item(s)</span>
+      </summary>
+      <div class="body">
+        <div class="item">
+          <div class="decision">{{DECISION}}</div>
+          <div class="principle">{{PRINCIPLE}}</div>
+          <span class="skill-tag">{{OWNING_SKILL}}</span>
+        </div>
+        <!-- more .item blocks -->
+      </div>
+    </details>
+  </div>
+
+  <!-- Open Risks section uses .risk-item instead of .item -->
+  <div class="accordion">
+    <details class="group">
+      <summary>
+        <span class="summary-left">Open Risks</span>
+        <span class="count">{{N}} item(s)</span>
+      </summary>
+      <div class="body">
+        <div class="risk-item">{{RISK_DESCRIPTION}}</div>
+      </div>
+    </details>
+  </div>
+
+  <div class="gate">
+    <div class="label">Final Verification Gate</div>
+    <p>{{FINAL_VERIFICATION_GATE_TEXT}}</p>
+  </div>
+</div>
