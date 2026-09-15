@@ -1,6 +1,6 @@
 ---
 name: thinkwise-software-factory-translation-objects
-description: Reference guide for translating model objects in a Thinkwise Software Factory model — the transl_object/transl_object_transl entities, appl_lang/branch_appl_lang, the approval_status review workflow, and naming/plural/help-text conventions. Use whenever an MCP connector with Software Factory access (e.g. sf_mcp, sf_dev_wiz_mcp, insights) reads, writes, generates, or reviews translations — before calling get_entity_definition/get_task_definition/execute_odata_query/stage_task against transl_object, transl_object_transl, appl_lang, or branch_appl_lang.
+description: Reference guide for translating model objects in a Thinkwise Software Factory model — the transl_object/transl_object_transl entities, appl_lang/branch_appl_lang, the approval_status review workflow, naming/plural/help-text conventions, and linking a base model to back-fill an officially supported language instead of hand-translating it. Use whenever an MCP connector with Software Factory access (e.g. sf_mcp, sf_dev_wiz_mcp, insights) reads, writes, generates, or reviews translations, or adds a new application language — before calling get_entity_definition/get_task_definition/execute_odata_query/stage_task against transl_object, transl_object_transl, appl_lang, branch_appl_lang, linked_model, or linked_model_available.
 ---
 
 # Translating Objects in the Thinkwise Software Factory
@@ -281,6 +281,15 @@ below) or flag to the user that it will be English/source-language-only for now.
 
 ## Multiple languages
 
+**Adding a new language? Check whether it's officially supported before translating anything by
+hand.** Thinkwise ships a pre-translated base model per officially supported GUI language
+(`GUI_TRANSL_<lang>`, plus a narrower `<RDBMS>_MSG_TRANSL_<lang>` for database error text on some
+RDBMS/language combos) — linking and merging that base model back-fills the platform's own standard
+translations for free. Manual translation via this skill is then only needed for the application's
+**own** objects. See `references/officially_supported_languages.md` for the live-verified language
+↔ base-model mapping and the full link → merge → generate recipe before doing any manual work on a
+newly-added `branch_appl_lang`.
+
 **`appl_lang`** (in a `manage_datamodel`-style domain, model-independent) is the global catalogue:
 `appl_lang_id` (the IETF tag, e.g. `en-US`, key) and `appl_lang_description`. **`branch_appl_lang`**
 (in `manage_translation`) links one of those to a specific `(model_id, branch_id)` — it's how a branch
@@ -376,6 +385,10 @@ behavior to confirm if a parameterized label misbehaves.
 
 ## Pre-flight checklist
 
+- **Adding a new language that's on the officially supported list?** Link its `GUI_TRANSL_<lang>`
+  base model (and matching `<RDBMS>_MSG_TRANSL_<lang>` if one exists for the branch's RDBMS), merge
+  it into the work model, and generate — before doing any manual translation. See
+  `references/officially_supported_languages.md`.
 - **Never create a `transl_object` as your first move.** Search first: query the bare
   `transl_object_id` across every plausible `type_of_object` from the lookup table above, not just
   the obvious one, and look for an existing (possibly `[bracketed]`) row before concluding one is
